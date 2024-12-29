@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade Viewer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>KAPOY HUWAT</h1>
+        <div class="select-container">
+            <label for="syYear">Select School Year:</label>
+            <select id="syYear"></select>
+            <label for="syPeriod">Select Semester:</label>
+            <select id="syPeriod">
+                <option value="1">1st Semester</option>
+                <option value="2">2nd Semester</option>
+            </select>
+        </div>
+        <div id="schoolYearInfo" style="text-align: center; margin: 20px 0;"></div>
+        <table id="gradesTable">
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Midterm</th>
+                    <th>Final</th>
+                    <th>Remark</th>
+                    <th>Pending</th>
+                    <th>Instructor</th>
+                </tr>
+            </thead>
+            <tbody>
+              
+            </tbody>
+        </table>
+    </div>
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loader"></div>
+    </div>
+    <div id="errorMessage" style="color: red; text-align: center; margin: 20px 0; display: none;"></div>
+    <script src="script.js"></script>
+    <script>
+        const syYearSelect = document.getElementById("syYear");
+        const currentYear = new Date().getFullYear();
+
+        for (let year = 2020; year <= currentYear + 1; year++) {
+            const option = document.createElement("option");
+            option.value = year;
+            option.textContent = year;
+            syYearSelect.appendChild(option);
+        }
+
+        syYearSelect.value = currentYear;
+    </script>
+</body>
+</html>
