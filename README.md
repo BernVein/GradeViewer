@@ -16,7 +16,7 @@ View PENDING... grades.
    - Extract the contents of the downloaded ZIP file to a folder on your computer.
 
 3. **Enable Developer Mode**:
-   - Open Chrome and navigate to [here](chrome://extensions/).
+   - Open Chrome and navigate to `chrome://extensions/`.
    - Toggle the switch in the top-right corner to enable **Developer Mode**.
 
 4. **Load the unpacked extension**:
