@@ -10,7 +10,7 @@ View PENDING... grades.
 ### Steps to Install
 
 1. **Download the extension**:
-   - Dowload the zip [here](https://github.com/BernVein/GradeViewer/archive/refs/heads/master.zip).
+   - Download the zip [here](https://github.com/BernVein/GradeViewer/archive/refs/heads/master.zip).
 
 2. **Unzip the file**:
    - Extract the contents of the downloaded ZIP file to a folder on your computer.
