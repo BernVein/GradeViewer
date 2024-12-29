@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "VSU Grade Viewer",
-    "description": "View grades dynamically from https://my.vsu.edu.ph/",
+    "description": "View pending grades from https://my.vsu.edu.ph/",
     "version": "1.0",
     "permissions": [
         "https://my.vsu.edu.ph/",
