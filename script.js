@@ -25,7 +25,7 @@ const fetchGrades = async () => {
         if (!token) throw new Error("Token not found. Please log in.");
 
         console.log("Script.js: Using token:", token);
-        // Format sa pag fetch: grades?sy_year=${Current Year}&sy_period=${1st sem = 1, 2nd sem = 2}
+
         const response = await fetch(
             `https://c1-student.vsu.edu.ph/api/students/grades?sy_year=${syYear}&sy_period=${syPeriod}`,
             {
@@ -67,70 +67,68 @@ const fetchGrades = async () => {
         let weightedGrades = 0;
 
         data.grades.forEach((item) => {
-            const midtermGrade = parseFloat(item.grade.midterm);
-            const finalGrade = parseFloat(item.grade.final);
-            const subjectUnits = parseFloat(item.offer.subject.units);
+            const midtermGrade = item.grade.midterm !== null ? parseFloat(item.grade.midterm) : null;
+            const finalGrade = item.grade.final !== null ? parseFloat(item.grade.final) : null;
+            const subjectUnits = item.offer.subject.units !== null ? parseFloat(item.offer.subject.units) : 0;
+
+            if (midtermGrade === null && finalGrade === null) {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${item.offer.subject.description}</td>
+                    <td>No grade</td>
+                    <td>No grade</td>
+                    <td>No grade</td>
+                    <td>No grade</td>
+                    <td>${item.grade.credited ? "No" : "Yes"}</td>
+                    <td>${item.offer.staff.fullname}</td>
+                `;
+                gradesTableBody.appendChild(row);
+                return; 
+            }
 
             if (!isNaN(finalGrade) && !isNaN(subjectUnits)) {
                 weightedGrades += finalGrade * subjectUnits;
                 totalUnits += subjectUnits;
             }
-            // Estimated Finals Grade is assuming na ang grading system is 50% midterm, 50% finals
-            const estimatedFinalsGrade = (2 * finalGrade) - midtermGrade;
+
+            const estimatedFinalsGrade = (2 * (finalGrade || 0)) - (midtermGrade || 0); 
 
             const row = document.createElement("tr");
+
+            const midtermCell = document.createElement("td");
+            midtermCell.textContent = midtermGrade !== null ? midtermGrade.toFixed(2) : "No grade";
+            midtermCell.style.color = (isNaN(midtermGrade) ? "red" : (midtermGrade < 1.0 ? "#8f00ff" : (midtermGrade > 5.0 ? "purple" : (midtermGrade > 3.0 ? "red" : "green"))));
+
+            const estimatedFinalsCell = document.createElement("td");
+            estimatedFinalsCell.textContent = estimatedFinalsGrade.toFixed(2) || "No grade";
+            estimatedFinalsCell.style.color = (isNaN(estimatedFinalsGrade) ? "red" : (estimatedFinalsGrade < 1.0 ? "#8f00ff" : (estimatedFinalsGrade > 5.0 ? "purple" : (estimatedFinalsGrade > 3.0 ? "red" : "green"))));
+
+            const finalGradeCell = document.createElement("td");
+            finalGradeCell.textContent = finalGrade !== null ? finalGrade.toFixed(2) : "No grade";
+            finalGradeCell.style.color = (isNaN(finalGrade) ? "red" : (finalGrade < 1.0 ? "#8f00ff" : (finalGrade > 5.0 ? "purple" : (finalGrade > 3.0 ? "red" : "green"))));
+
+            const remarkCell = document.createElement("td");
+            const remarkText = item.grade.remark || "No grade";
+            remarkCell.textContent = remarkText;
+
+            remarkCell.style.color = remarkText.toLowerCase() === "passed" ? "green" : "red";
+
             row.innerHTML = `
                 <td>${item.offer.subject.description}</td>
-                <td>${midtermGrade.toFixed(2) || "N/A"}</td>
-                <td>${estimatedFinalsGrade.toFixed(2) || "N/A"}</td>
-                <td>${finalGrade.toFixed(2) || "N/A"}</td>
-                <td>${item.grade.remark}</td>
+            `;
+            row.appendChild(midtermCell); 
+            row.appendChild(estimatedFinalsCell); 
+            row.appendChild(finalGradeCell); 
+            row.appendChild(remarkCell);
+            row.innerHTML += `
                 <td>${item.grade.credited ? "No" : "Yes"}</td>
                 <td>${item.offer.staff.fullname}</td>
             `;
 
-            const midtermCell = row.querySelector("td:nth-child(2)");
-            const estimatedFinalsCell = row.querySelector("td:nth-child(3)");
-            const finalGradeCell = row.querySelector("td:nth-child(4)");
-            const remarkCell = row.querySelector("td:nth-child(5)");
-
-            if (isNaN(midtermGrade) || midtermGrade > 3.0) {
-                midtermCell.style.color = "red";
-            } else {
-                midtermCell.style.color = "green";
-            }
-
-            if (isNaN(estimatedFinalsGrade) || estimatedFinalsGrade > 3.0) {
-                estimatedFinalsCell.style.color = "red";
-            } else {
-                estimatedFinalsCell.style.color = "green";
-            }
-
-            if (isNaN(finalGrade) || finalGrade > 3.0) {
-                finalGradeCell.style.color = "red";
-            } else {
-                finalGradeCell.style.color = "green";
-            }
-
-            if (item.grade.remark.toLowerCase() === "passed") {
-                remarkCell.style.color = "green";
-            } else {
-                remarkCell.style.color = "red";
-            }
-
-            [midtermCell, estimatedFinalsCell, finalGradeCell].forEach((cell) => {
-                const grade = parseFloat(cell.textContent);
-                if (!isNaN(grade) && grade < 1.0) {
-                    cell.style.color = "#8B00FF"; 
-                    cell.title = "Suspicious grade, basin gi magic magic";
-                }
-            });
-
             gradesTableBody.appendChild(row);
         });
-        
+
         if (totalUnits > 0) {
-            // GPA calculation according to BSCS pres 2024 -> (Units * final grade) + ... n / totalUnits
             const gpa = (weightedGrades / totalUnits).toFixed(2);
             gpaDisplay.textContent = `Estimated GPA: ${gpa}`;
         } else {
