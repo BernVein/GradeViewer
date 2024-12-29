@@ -1,6 +1,6 @@
 # Chrome Extension: VSU Grade Viewer
 
-View PENDING... grades.
+View **"PENDING..."** grades.
 ---
 ## Manual Installation Guide
 
